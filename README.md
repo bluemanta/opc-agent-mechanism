@@ -2,7 +2,7 @@
 
 > 🤖 A data-driven visualization of the OPC (One Person Company) + AI Agent collaborative workflow system.
 
-**Version**: v3.0 (Linear-Centric Architecture)  
+**Version**: v0.1 (MVP)  
 **License**: [CC BY-NC 4.0](#license) (Non-Commercial Use Only)
 
 ---
