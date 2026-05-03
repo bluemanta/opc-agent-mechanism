@@ -1,0 +1,287 @@
+/* OPC Agent Mechanism - 浅色主题样式 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #f5f7fa;
+  color: #2c3e50;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+header {
+  text-align: center;
+  padding: 40px 20px;
+  background: white;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+header h1 {
+  font-size: 2.2em;
+  color: #3498db;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  color: #7f8c8d;
+  font-size: 1.1em;
+}
+
+section {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+section h2 {
+  font-size: 1.8em;
+  margin-bottom: 20px;
+  color: #2c3e50;
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 10px;
+}
+
+/* 架构图 */
+.mermaid {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+/* 标签树 */
+#label-tree {
+  font-size: 0.95em;
+}
+
+.label-group {
+  margin-bottom: 20px;
+  border: 1px solid #ecf0f1;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.label-group-header {
+  background: #f8f9fa;
+  padding: 12px 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.label-group-header:hover {
+  background: #ecf0f1;
+}
+
+.label-group-header::before {
+  content: '▼ ';
+  margin-right: 10px;
+  font-size: 0.8em;
+  transition: transform 0.2s;
+}
+
+.label-group.collapsed .label-group-header::before {
+  transform: rotate(-90deg);
+}
+
+.label-group-body {
+  padding: 15px 20px;
+  background: white;
+}
+
+.label-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 15px;
+  margin: 5px 0;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.label-item:hover {
+  background: #f8f9fa;
+}
+
+.label-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  margin-right: 12px;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+.label-name {
+  font-weight: 500;
+  flex: 1;
+}
+
+.label-desc {
+  color: #7f8c8d;
+  font-size: 0.9em;
+}
+
+/* 工作流 */
+.workflow-states {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.state {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  color: white;
+  font-size: 0.95em;
+}
+
+.state.backlog { background: #95a5a6; }
+.state.unstarted { background: #3498db; }
+.state.started { background: #f39c12; }
+.state.completed { background: #2ecc71; }
+
+.arrow {
+  font-size: 1.5em;
+  color: #bdc3c7;
+}
+
+.rules-list {
+  list-style: none;
+  padding: 0;
+}
+
+.rules-list li {
+  padding: 10px 15px;
+  margin: 5px 0;
+  background: #fff9e6;
+  border-left: 4px solid #f1c40f;
+  border-radius: 4px;
+}
+
+/* Agent 卡片 */
+.agent-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.agent-card {
+  border: 1px solid #ecf0f1;
+  border-radius: 10px;
+  padding: 20px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.agent-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.agent-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.agent-icon {
+  font-size: 1.8em;
+  margin-right: 12px;
+}
+
+.agent-name {
+  font-size: 1.3em;
+  font-weight: 600;
+}
+
+.agent-role {
+  color: #7f8c8d;
+  font-size: 0.9em;
+}
+
+.agent-label {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  margin: 10px 0;
+  background: #ecf0f1;
+}
+
+.agent-duties {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+}
+
+.agent-duties li {
+  padding: 5px 0;
+  color: #555;
+}
+
+.agent-duties li::before {
+  content: '✓ ';
+  color: #2ecc71;
+  margin-right: 5px;
+}
+
+.config-example {
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 15px;
+  margin-top: 15px;
+  font-size: 0.85em;
+  overflow-x: auto;
+}
+
+.config-example pre {
+  margin: 0;
+  color: #2c3e50;
+}
+
+footer {
+  text-align: center;
+  padding: 30px;
+  color: #7f8c8d;
+  font-size: 0.9em;
+}
+
+footer a {
+  color: #3498db;
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .container { padding: 10px; }
+  header { padding: 20px 15px; }
+  section { padding: 20px 15px; }
+  .agent-cards { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OPC Agent Mechanism v3.0</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🤖 OPC + Agent 协作机制</h1>
+      <p class="subtitle">v3.0 · Linear-Centric 架构 · 数据驱动可视化</p>
+    </header>
+
+    <!-- 1. 系统架构图 -->
+    <section id="architecture">
+      <h2>🏗️ 系统逻辑架构</h2>
+      <div class="mermaid" id="arch-diagram">
+        graph LR
+          A[Chris OPC] -->|制定战略| B[嘉怡 PM Agent]
+          B -->|分配任务| C[Bob/Alice Dev Agents]
+          C -->|读写 API| D[Linear 中台]
+          D -->|审核结果| A
+      </div>
+    </section>
+
+    <!-- 2. 标签层级树 -->
+    <section id="labels">
+      <h2>🏷️ 标签层级体系</h2>
+      <div id="label-tree"></div>
+    </section>
+
+    <!-- 3. 任务流转 -->
+    <section id="workflow">
+      <h2>🔄 任务流转规则</h2>
+      <div id="workflow-diagram"></div>
+      <div id="workflow-rules"></div>
+    </section>
+
+    <!-- 4. Agent 卡片 -->
+    <section id="agents">
+      <h2>🤖 Agent 目录</h2>
+      <div id="agent-cards"></div>
+    </section>
+
+    <footer>
+      <p>OPC Agent Mechanism v3.0 · 数据驱动 · 
+        <a href="data/config.json">查看 config.json</a>
+      </p>
+    </footer>
+  </div>
+
+  <script src="js/render-labels.js"></script>
+  <script src="js/render-agents.js"></script>
+  <script>
+    // 初始化 Mermaid
+    mermaid.initialize({ 
+      startOnLoad: true,
+      theme: 'default',
+      flowchart: { curve: 'basis' }
+    });
+
+    // 加载数据并渲染
+    fetch('data/config.json')
+      .then(res => res.json())
+      .then(data => {
+        // 渲染标签树
+        renderLabelTree(data.labels);
+        
+        // 渲染 Agent 卡片
+        renderAgentCards(data.agents);
+        
+        // 渲染工作流
+        renderWorkflow(data.workflow);
+      })
+      .catch(err => console.error('加载数据失败:', err));
+    
+    // 工作流渲染
+    function renderWorkflow(workflow) {
+      const diagram = document.getElementById('workflow-diagram');
+      const rules = document.getElementById('workflow-rules');
+      
+      // 状态流转
+      const states = workflow.states;
+      let html = '<div class="workflow-states">';
+      states.forEach((s, i) => {
+        html += `<span class="state ${s.type}">${s.name}</span>`;
+        if (i < states.length - 1) {
+          html += ' <span class="arrow">→</span> ';
+        }
+      });
+      html += '</div>';
+      diagram.innerHTML = html;
+      
+      // 规则列表
+      let rulesHtml = '<ul class="rules-list">';
+      workflow.rules.forEach(rule => {
+        rulesHtml += `<li>${rule}</li>`;
+      });
+      rulesHtml += '</ul>';
+      rules.innerHTML = rulesHtml;
+    }
+  </script>
+</body>
+</html>

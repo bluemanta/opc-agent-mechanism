@@ -1,0 +1,82 @@
+{
+  "version": "3.0",
+  "last_updated": "2026-05-03",
+  "labels": {
+    "🎭 角色标签": [
+      {"name": "AI-Dev", "color": "#3498db", "desc": "开发任务"},
+      {"name": "AI-Test", "color": "#2ecc71", "desc": "测试任务"},
+      {"name": "AI-Design", "color": "#9b59b6", "desc": "设计任务"},
+      {"name": "AI-Review", "color": "#e67e22", "desc": "审查任务"},
+      {"name": "AI-Docs", "color": "#1abc9c", "desc": "文档任务"},
+      {"name": "AI-Ops", "color": "#e74c3c", "desc": "运维任务"}
+    ],
+    "👤 员工标签": [
+      {"name": "Dev-Bob", "color": "#2ecc71", "desc": "Bob 的开发任务"},
+      {"name": "Dev-Oao", "color": "#2ecc71", "desc": "Oao 的开发任务"}
+    ],
+    "📋 任务类型": [
+      {"name": "Needs-Human-Review", "color": "#f1c40f", "desc": "需要 Chris 审核"},
+      {"name": "Agent-Blocked", "color": "#95a5a6", "desc": "Agent 被阻塞"},
+      {"name": "Auto-Generated", "color": "#85c1e9", "desc": "Agent 自动创建"},
+      {"name": "Bug", "color": "#e74c3c", "desc": "缺陷修复"},
+      {"name": "Feature", "color": "#f39c12", "desc": "新功能"},
+      {"name": "Improvement", "color": "#f1c40f", "desc": "改进优化"}
+    ]
+  },
+  "agents": [
+    {
+      "name": "嘉怡",
+      "role": "PM Agent",
+      "icon": "🤖",
+      "label": null,
+      "duties": ["制定规范", "创建标签", "审计合规", "协调 Agent"],
+      "config_example": {
+        "agent_name": "嘉怡",
+        "agent_role": "PM-Agent",
+        "api_key_env": "LINEAR_API_KEY"
+      }
+    },
+    {
+      "name": "Bob",
+      "role": "Dev Agent",
+      "icon": "🤖",
+      "label": "Dev-Bob",
+      "duties": ["开发功能", "修复 Bug", "提交 PR"],
+      "config_example": {
+        "agent_name": "Bob",
+        "agent_label": "Dev-Bob",
+        "api_key_env": "LINEAR_BOB_KEY"
+      }
+    }
+  ],
+  "workflow": {
+    "states": [
+      {"name": "Backlog", "type": "backlog", "color": "#95a5a6"},
+      {"name": "Todo", "type": "unstarted", "color": "#3498db"},
+      {"name": "In Progress", "type": "started", "color": "#f39c12"},
+      {"name": "In Review", "type": "started", "color": "#9b59b6"},
+      {"name": "Done", "type": "completed", "color": "#2ecc71"}
+    ],
+    "rules": [
+      "Agent 无权将状态改为 Done",
+      "完成开发后状态改为 In Review",
+      "必须添加 Needs-Human-Review 标签",
+      "Chris 审核通过后，由人工改为 Done"
+    ],
+    "comment_format": "🤖 **{Agent名称}** 更新 (YYYY-MM-DD HH:MM)\\n\\n**状态**: {状态}\\n**进度**: {XX%}\\n**详情**: {描述}\\n\\n**相关链接**:\\n- PR: {URL}"
+  },
+  "architecture": {
+    "nodes": [
+      {"id": "opc", "label": "Chris (OPC)", "shape": "box"},
+      {"id": "pm", "label": "嘉怡 (PM Agent)", "shape": "box"},
+      {"id": "dev", "label": "Bob/Alice (Dev Agents)", "shape": "box"},
+      {"id": "linear", "label": "Linear (中台)", "shape": "box"}
+    ],
+    "edges": [
+      {"from": "opc", "to": "pm", "label": "制定战略"},
+      {"from": "pm", "to": "dev", "label": "分配任务"},
+      {"from": "dev", "to": "linear", "label": "读写 API"},
+      {"from": "linear", "to": "opc", "label": "审核结果"}
+    ]
+  }
+}
