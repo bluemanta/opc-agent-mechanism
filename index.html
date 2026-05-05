@@ -25,9 +25,10 @@
         <span>01</span>
         <div>
           <h2>协作架构</h2>
-          <p>把 Hermes、Linear、项目上下文和桌面 Agent 的职责拆清楚。</p>
+          <p>Linear Issue 是任务本体；桌面 Agent 直接读取 Issue，并结合自身项目上下文执行。</p>
         </div>
       </div>
+      <div class="logic-diagram" id="logic-diagram" aria-label="系统逻辑架构图"></div>
       <div class="architecture-grid" id="architecture-nodes"></div>
       <div class="flow-strip" id="architecture-flow"></div>
     </section>
@@ -66,8 +67,8 @@
         <div class="section-heading compact">
           <span>04</span>
           <div>
-            <h2>轻量 Issue 模板</h2>
-            <p>Issue 不重复项目背景，只提供本次执行所需的最小差量。</p>
+            <h2>Linear Issue 模板</h2>
+            <p>Issue 是任务本体，需要写清目标、范围、验收和回填要求。</p>
           </div>
         </div>
         <div class="template-card" id="issue-template-card"></div>
@@ -82,8 +83,8 @@
       <div class="section-heading">
         <span>05</span>
         <div>
-          <h2>桌面 Agent 执行席位</h2>
-          <p>这些不是后台机器人，而是你可以手动启动、由 Hermes 编排的执行工具。</p>
+          <h2>桌面 Agent</h2>
+          <p>这些不是后台机器人，而是已经绑定项目上下文、可直接读取 Linear Issue 的桌面执行工具。</p>
         </div>
       </div>
       <div class="executor-grid" id="executor-grid"></div>
@@ -114,6 +115,6 @@
     </footer>
   </main>
 
-  <script src="js/app.js"></script>
+  <script src="js/app.js?v=20260505-7"></script>
 </body>
 </html>

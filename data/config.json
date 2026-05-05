@@ -3,67 +3,120 @@
   "last_updated": "2026-05-05",
   "positioning": {
     "title": "Linear + Hermes + Desktop Agents",
-    "subtitle": "以 Linear 为唯一任务账本，由 Hermes 编排，桌面 Agent 执行的半自动 OPC 工作流",
+    "subtitle": "以 Linear Issue 为任务本体，桌面 Agent 直接读取并执行的半自动 OPC 工作流",
     "principles": [
-      "Linear 记录任务、状态、证据和审核结论",
-      "Hermes 负责拆解、分发、追踪和上下文维护",
-      "桌面 Agent 是执行席位，不要求第一阶段无人值守",
-      "项目背景放在项目层，Issue 只写本次任务差量",
+      "Linear Issue 是任务本体，也是唯一任务账本",
+      "Hermes 负责协助创建、梳理、优先级排序、审核和追踪 Issue",
+      "桌面 Agent 直接读取 Linear Issue，并结合自身项目 session 上下文执行",
+      "桌面 Agent 的执行结果直接回填到 Linear Issue",
+      "如果任务不够清楚，优先把 Linear Issue 写得更完整",
       "Agent 完成不等于闭环，Verified 才代表任务真正结束"
     ]
   },
   "architecture": {
+    "diagram": {
+      "nodes": [
+        {
+          "id": "chris",
+          "label": "Chris OPC"
+        },
+        {
+          "id": "linear",
+          "label": "Linear Issue 账本"
+        },
+        {
+          "id": "hermes",
+          "label": "Hermes 治理"
+        },
+        {
+          "id": "agents",
+          "label": "桌面 Agent"
+        }
+      ],
+      "links": [
+        {
+          "from": "chris",
+          "to": "hermes",
+          "label": "目标 / 优先级"
+        },
+        {
+          "from": "linear",
+          "to": "hermes",
+          "label": "读取 Ready Issue"
+        },
+        {
+          "from": "context",
+          "to": "hermes",
+          "label": "项目 session 上下文"
+        },
+        {
+          "from": "linear",
+          "to": "agents",
+          "label": "直接读取 Issue"
+        }
+      ],
+      "feedback": {
+        "from": "agents",
+          "to": "linear",
+        "label": "直接写入 Issue：状态 / 证据 / 风险"
+        },
+      "review": {
+        "from": "linear",
+        "to": "chris",
+        "label": "Chris + Hermes 在 Linear 审核"
+      }
+    },
     "nodes": [
       {
         "id": "human",
         "label": "Chris / OPC",
-        "desc": "提出目标、做关键决策、最终确认"
+        "desc": "提出目标、做关键决策、在 Linear 中最终确认"
       },
       {
         "id": "hermes",
         "label": "Hermes",
-        "desc": "Telegram 编排大脑：整理待办、生成执行包、追踪回填"
+        "desc": "Telegram 任务治理助手：协助创建、梳理、审核和追踪 Linear Issue"
       },
       {
         "id": "linear",
         "label": "Linear",
-        "desc": "唯一任务账本：Issue、状态、评论、证据、审核结果"
+        "desc": "唯一任务账本与任务本体：Issue、状态、评论、证据、审核结果"
       },
       {
         "id": "project",
-        "label": "Project Context",
-        "desc": "Linear Project 摘要 + 本地 PROJECT_CONTEXT.md"
+        "label": "Project Session Context",
+        "desc": "桌面 Agent 在 IDE / 本地项目 session 中已经持有的项目上下文"
       },
       {
         "id": "executors",
         "label": "Desktop Agents",
-        "desc": "Cursor、Codex App、Claude Code Desktop、AntiGravity"
+        "desc": "Cursor、Codex App、Claude Code Desktop、AntiGravity 半自动执行"
       }
     ],
     "flow": [
       "Chris 与 Hermes 在 Telegram 中确定优先级",
-      "Hermes 从 Linear 读取 Ready Issue 并生成执行包",
-      "Chris 选择桌面 Agent 执行，必要时复制执行包",
-      "Agent 在本地项目中完成任务并输出证据",
-      "Hermes 回填 Linear，推动 Review 与 Verified"
+      "Hermes 协助把想法整理成清晰的 Linear Issue",
+      "桌面 Agent 直接读取 Linear Issue，并结合自身项目 session 上下文执行",
+      "Agent 完成后直接回填 Linear Issue 的状态、证据和风险",
+      "Chris 和 Hermes 在 Linear 中审核结果，推动 Review 与 Verified"
     ]
   },
   "context_layers": [
     {
       "name": "项目上下文层",
-      "owner": "Hermes",
-      "purpose": "沉淀长期稳定信息，避免每个 Issue 重复背景",
+      "owner": "Desktop Agent Session",
+      "purpose": "桌面 Agent 在 IDE / 本地项目中持有项目背景，Issue 不需要重复全部项目说明",
       "contents": [
         "项目目标、当前阶段、关键决策",
         "本地 repo 路径、运行方式、常用命令",
         "技术栈、目录说明、代码风格、禁区",
-        "默认执行 Agent、常见任务类型、验证方式"
+        "当前 session 的历史上下文、常见任务类型、验证方式"
       ]
     },
     {
       "name": "Issue 任务差量层",
-      "owner": "Hermes / Chris",
-      "purpose": "只描述这一次要做什么，以及额外上下文",
+      "owner": "Chris / Hermes",
+      "purpose": "Linear Issue 是任务本体，需要写清本次任务的目标、范围和验收",
       "contents": [
         "Task：本次目标",
         "Specific Context：本次额外背景",
@@ -73,13 +126,13 @@
     },
     {
       "name": "执行回填层",
-      "owner": "Desktop Agent / Hermes",
-      "purpose": "记录执行证据，支撑 Review 和 Verified",
+      "owner": "Desktop Agent",
+      "purpose": "执行结果直接写入 Linear Issue，支撑 Review 和 Verified",
       "contents": [
         "变更摘要、文件或产物链接",
         "验证命令与结果",
         "风险、阻塞点、下一步建议",
-        "是否建议更新项目上下文"
+        "是否建议 Hermes 更新项目上下文"
       ]
     }
   ],
@@ -92,8 +145,8 @@
       },
       {
         "name": "Ready",
-        "desc": "Issue 已具备目标、上下文入口和验收标准",
-        "actor": "Hermes"
+        "desc": "Issue 已具备目标、范围和验收标准，桌面 Agent 可直接读取执行",
+        "actor": "Chris / Hermes"
       },
       {
         "name": "In Progress",
@@ -123,10 +176,10 @@
     ],
     "rules": [
       "Agent 完成任务后进入 Review，不直接进入 Verified",
-      "项目默认 Agent 可从 Linear Project 继承，Issue 只写例外",
-      "Issue 必须指向项目上下文入口",
+      "桌面 Agent 直接读取 Linear Issue，不经过 Hermes 中转",
+      "Issue 应写清本次任务目标、范围、验收标准和回填要求",
       "缺少验收标准的 Issue 不进入 Ready",
-      "Hermes 主维护项目上下文，Agent 只提出更新建议"
+      "Hermes 负责 Issue 治理与审核追踪，不生成必经执行包"
     ]
   },
   "issue_template": {
@@ -136,12 +189,12 @@
         "body": "本次要完成什么。"
       },
       {
-        "title": "Project Context",
-        "body": "使用项目上下文：{Linear Project / repo PROJECT_CONTEXT.md}"
+        "title": "Background",
+        "body": "本任务必要背景。项目通用背景不用重复，除非本任务特别相关。"
       },
       {
-        "title": "Specific Context",
-        "body": "这次任务额外需要知道的信息。没有就写“无”。"
+        "title": "Scope",
+        "body": "本次要做什么 / 不做什么。"
       },
       {
         "title": "Acceptance",
@@ -149,10 +202,10 @@
       },
       {
         "title": "Return Evidence",
-        "body": "完成后回填：变更摘要、文件/链接、验证结果、风险、下一步建议。"
+        "body": "完成后直接在 Linear Issue 回填：变更摘要、文件/链接、验证结果、风险、下一步建议。"
       }
     ],
-    "executor_override": "仅当不使用项目默认 Agent 时填写：Executor override + 原因"
+    "executor_override": "仅当需要指定某个桌面 Agent 时填写：Target desktop agent + 原因"
   },
   "executors": [
     {
@@ -164,7 +217,7 @@
         "结构化重构",
         "把计划落成代码改动"
       ],
-      "handoff": "复杂设计问题回 Hermes；视觉验证可转浏览器验证流程",
+      "handoff": "直接读取 Linear Issue，完成后直接回填 Issue；复杂设计问题可在 Issue 中标记需要澄清",
       "limits": [
         "不直接 Verified",
         "不处理缺少验收标准的任务",
@@ -180,7 +233,7 @@
         "复杂重构前分析",
         "生成实现建议"
       ],
-      "handoff": "需要落地验证时转 Codex App 或 Cursor",
+      "handoff": "直接读取 Linear Issue；需要落地验证时可在 Issue 中建议转 Codex App 或 Cursor",
       "limits": [
         "输出必须包含文件和验证建议",
         "不把分析结论当作已验证结果"
@@ -195,7 +248,7 @@
         "UI 细节调整",
         "人工强参与的编辑"
       ],
-      "handoff": "完成后由 Hermes 汇总回填；必要时由 Codex App 复验",
+      "handoff": "直接读取 Linear Issue，完成后直接回填 Linear；必要时由 Codex App 复验",
       "limits": [
         "避免承担跨项目批处理",
         "需要明确当前项目上下文"
@@ -210,7 +263,7 @@
         "跨工具思路验证",
         "不确定任务拆解"
       ],
-      "handoff": "将探索结果整理成 Linear Issue 或项目上下文更新",
+      "handoff": "直接读取 Linear Issue；将探索结果回填到 Issue 或提出新 Issue 建议",
       "limits": [
         "探索输出必须收敛成可执行下一步",
         "不直接改 Verified 状态"
@@ -220,23 +273,23 @@
   "daily_routine": [
     {
       "time": "09:00",
-      "title": "Hermes 读取 Linear",
-      "desc": "按项目读取 Ready / Blocked / Review Issue，生成 Telegram 摘要"
+      "title": "Hermes 巡检 Linear",
+      "desc": "按项目查看 Ready / Blocked / Review Issue，生成 Telegram 摘要"
     },
     {
       "time": "09:15",
-      "title": "Chris 选择执行任务",
-      "desc": "确认今天要处理的任务和推荐桌面 Agent"
+      "title": "补齐 Issue",
+      "desc": "Chris 和 Hermes 把目标、范围、验收和回填要求补充清楚"
     },
     {
       "time": "执行中",
-      "title": "桌面 Agent 执行",
-      "desc": "使用项目上下文和轻量 Issue 执行任务，输出证据"
+      "title": "桌面 Agent 直读 Issue",
+      "desc": "Agent 在对应项目 session 中读取 Linear Issue，结合已有项目上下文执行"
     },
     {
       "time": "完成后",
-      "title": "Hermes 回填与追踪",
-      "desc": "更新 Linear 评论和状态，提醒 Review 或进入 Verified"
+      "title": "Linear 中审核",
+      "desc": "桌面 Agent 已直接回填 Linear，Chris 和 Hermes 在 Linear 中审核并推动状态"
     }
   ],
   "roadmap": [
@@ -244,18 +297,18 @@
       "version": "v0.2",
       "title": "半自动调度",
       "items": [
-        "Hermes 自动读 Linear",
-        "生成每日任务摘要",
-        "生成可复制执行包"
+        "Hermes 巡检 Linear",
+        "补齐 Issue 质量",
+        "桌面 Agent 直接读 Issue"
       ]
     },
     {
       "version": "v0.3",
-      "title": "本地执行包",
+      "title": "Issue 质量治理",
       "items": [
-        "一键生成 prompt 文件",
-        "打开对应项目目录",
-        "标准化回填模板"
+        "标准 Issue 模板",
+        "验收标准检查",
+        "回填证据检查"
       ]
     },
     {
