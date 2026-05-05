@@ -1,82 +1,280 @@
 {
-  "version": "0.1",
-  "last_updated": "2026-05-03",
-  "labels": {
-    "🎭 角色标签": [
-      {"name": "AI-Dev", "color": "#3498db", "desc": "开发任务"},
-      {"name": "AI-Test", "color": "#2ecc71", "desc": "测试任务"},
-      {"name": "AI-Design", "color": "#9b59b6", "desc": "设计任务"},
-      {"name": "AI-Review", "color": "#e67e22", "desc": "审查任务"},
-      {"name": "AI-Docs", "color": "#1abc9c", "desc": "文档任务"},
-      {"name": "AI-Ops", "color": "#e74c3c", "desc": "运维任务"}
-    ],
-    "👤 员工标签": [
-      {"name": "Dev-Bob", "color": "#2ecc71", "desc": "Bob 的开发任务"},
-      {"name": "Dev-Oao", "color": "#2ecc71", "desc": "Oao 的开发任务"}
-    ],
-    "📋 任务类型": [
-      {"name": "Needs-Human-Review", "color": "#f1c40f", "desc": "需要 Chris 审核"},
-      {"name": "Agent-Blocked", "color": "#95a5a6", "desc": "Agent 被阻塞"},
-      {"name": "Auto-Generated", "color": "#85c1e9", "desc": "Agent 自动创建"},
-      {"name": "Bug", "color": "#e74c3c", "desc": "缺陷修复"},
-      {"name": "Feature", "color": "#f39c12", "desc": "新功能"},
-      {"name": "Improvement", "color": "#f1c40f", "desc": "改进优化"}
+  "version": "0.2",
+  "last_updated": "2026-05-05",
+  "positioning": {
+    "title": "Linear + Hermes + Desktop Agents",
+    "subtitle": "以 Linear 为唯一任务账本，由 Hermes 编排，桌面 Agent 执行的半自动 OPC 工作流",
+    "principles": [
+      "Linear 记录任务、状态、证据和审核结论",
+      "Hermes 负责拆解、分发、追踪和上下文维护",
+      "桌面 Agent 是执行席位，不要求第一阶段无人值守",
+      "项目背景放在项目层，Issue 只写本次任务差量",
+      "Agent 完成不等于闭环，Verified 才代表任务真正结束"
     ]
   },
-  "agents": [
-    {
-      "name": "嘉怡",
-      "role": "PM Agent",
-      "icon": "🤖",
-      "label": null,
-      "duties": ["制定规范", "创建标签", "审计合规", "协调 Agent"],
-      "config_example": {
-        "agent_name": "嘉怡",
-        "agent_role": "PM-Agent",
-        "api_key_env": "LINEAR_API_KEY"
+  "architecture": {
+    "nodes": [
+      {
+        "id": "human",
+        "label": "Chris / OPC",
+        "desc": "提出目标、做关键决策、最终确认"
+      },
+      {
+        "id": "hermes",
+        "label": "Hermes",
+        "desc": "Telegram 编排大脑：整理待办、生成执行包、追踪回填"
+      },
+      {
+        "id": "linear",
+        "label": "Linear",
+        "desc": "唯一任务账本：Issue、状态、评论、证据、审核结果"
+      },
+      {
+        "id": "project",
+        "label": "Project Context",
+        "desc": "Linear Project 摘要 + 本地 PROJECT_CONTEXT.md"
+      },
+      {
+        "id": "executors",
+        "label": "Desktop Agents",
+        "desc": "Cursor、Codex App、Claude Code Desktop、AntiGravity"
       }
+    ],
+    "flow": [
+      "Chris 与 Hermes 在 Telegram 中确定优先级",
+      "Hermes 从 Linear 读取 Ready Issue 并生成执行包",
+      "Chris 选择桌面 Agent 执行，必要时复制执行包",
+      "Agent 在本地项目中完成任务并输出证据",
+      "Hermes 回填 Linear，推动 Review 与 Verified"
+    ]
+  },
+  "context_layers": [
+    {
+      "name": "项目上下文层",
+      "owner": "Hermes",
+      "purpose": "沉淀长期稳定信息，避免每个 Issue 重复背景",
+      "contents": [
+        "项目目标、当前阶段、关键决策",
+        "本地 repo 路径、运行方式、常用命令",
+        "技术栈、目录说明、代码风格、禁区",
+        "默认执行 Agent、常见任务类型、验证方式"
+      ]
     },
     {
-      "name": "Bob",
-      "role": "Dev Agent",
-      "icon": "🤖",
-      "label": "Dev-Bob",
-      "duties": ["开发功能", "修复 Bug", "提交 PR"],
-      "config_example": {
-        "agent_name": "Bob",
-        "agent_label": "Dev-Bob",
-        "api_key_env": "LINEAR_BOB_KEY"
-      }
+      "name": "Issue 任务差量层",
+      "owner": "Hermes / Chris",
+      "purpose": "只描述这一次要做什么，以及额外上下文",
+      "contents": [
+        "Task：本次目标",
+        "Specific Context：本次额外背景",
+        "Acceptance：验收标准",
+        "Return Evidence：回填要求"
+      ]
+    },
+    {
+      "name": "执行回填层",
+      "owner": "Desktop Agent / Hermes",
+      "purpose": "记录执行证据，支撑 Review 和 Verified",
+      "contents": [
+        "变更摘要、文件或产物链接",
+        "验证命令与结果",
+        "风险、阻塞点、下一步建议",
+        "是否建议更新项目上下文"
+      ]
     }
   ],
   "workflow": {
     "states": [
-      {"name": "Backlog", "type": "backlog", "color": "#95a5a6"},
-      {"name": "Todo", "type": "unstarted", "color": "#3498db"},
-      {"name": "In Progress", "type": "started", "color": "#f39c12"},
-      {"name": "In Review", "type": "started", "color": "#9b59b6"},
-      {"name": "Done", "type": "completed", "color": "#2ecc71"}
+      {
+        "name": "Backlog",
+        "desc": "想做但尚未整理成可执行任务",
+        "actor": "Chris / Hermes"
+      },
+      {
+        "name": "Ready",
+        "desc": "Issue 已具备目标、上下文入口和验收标准",
+        "actor": "Hermes"
+      },
+      {
+        "name": "In Progress",
+        "desc": "某个桌面 Agent 正在执行",
+        "actor": "Desktop Agent"
+      },
+      {
+        "name": "Review",
+        "desc": "Agent 已交付证据，等待 Hermes 或 Chris 复核",
+        "actor": "Hermes / Chris"
+      },
+      {
+        "name": "Verified",
+        "desc": "结果已确认，可关闭或沉淀",
+        "actor": "Chris / Hermes"
+      }
+    ],
+    "exceptions": [
+      {
+        "name": "Blocked",
+        "desc": "缺上下文、权限、决策或外部条件"
+      },
+      {
+        "name": "Cancelled",
+        "desc": "任务不再需要执行"
+      }
     ],
     "rules": [
-      "Agent 无权将状态改为 Done",
-      "完成开发后状态改为 In Review",
-      "必须添加 Needs-Human-Review 标签",
-      "Chris 审核通过后，由人工改为 Done"
-    ],
-    "comment_format": "🤖 **{Agent名称}** 更新 (YYYY-MM-DD HH:MM)\\n\\n**状态**: {状态}\\n**进度**: {XX%}\\n**详情**: {描述}\\n\\n**相关链接**:\\n- PR: {URL}"
-  },
-  "architecture": {
-    "nodes": [
-      {"id": "opc", "label": "Chris (OPC)", "shape": "box"},
-      {"id": "pm", "label": "嘉怡 (PM Agent)", "shape": "box"},
-      {"id": "dev", "label": "Bob/Alice (Dev Agents)", "shape": "box"},
-      {"id": "linear", "label": "Linear (中台)", "shape": "box"}
-    ],
-    "edges": [
-      {"from": "opc", "to": "pm", "label": "制定战略"},
-      {"from": "pm", "to": "dev", "label": "分配任务"},
-      {"from": "dev", "to": "linear", "label": "读写 API"},
-      {"from": "linear", "to": "opc", "label": "审核结果"}
+      "Agent 完成任务后进入 Review，不直接进入 Verified",
+      "项目默认 Agent 可从 Linear Project 继承，Issue 只写例外",
+      "Issue 必须指向项目上下文入口",
+      "缺少验收标准的 Issue 不进入 Ready",
+      "Hermes 主维护项目上下文，Agent 只提出更新建议"
     ]
-  }
+  },
+  "issue_template": {
+    "sections": [
+      {
+        "title": "Task",
+        "body": "本次要完成什么。"
+      },
+      {
+        "title": "Project Context",
+        "body": "使用项目上下文：{Linear Project / repo PROJECT_CONTEXT.md}"
+      },
+      {
+        "title": "Specific Context",
+        "body": "这次任务额外需要知道的信息。没有就写“无”。"
+      },
+      {
+        "title": "Acceptance",
+        "body": "什么算完成。"
+      },
+      {
+        "title": "Return Evidence",
+        "body": "完成后回填：变更摘要、文件/链接、验证结果、风险、下一步建议。"
+      }
+    ],
+    "executor_override": "仅当不使用项目默认 Agent 时填写：Executor override + 原因"
+  },
+  "executors": [
+    {
+      "name": "Codex App",
+      "role": "本地工程执行与验证",
+      "best_for": [
+        "跨文件代码修改",
+        "本地测试与构建验证",
+        "结构化重构",
+        "把计划落成代码改动"
+      ],
+      "handoff": "复杂设计问题回 Hermes；视觉验证可转浏览器验证流程",
+      "limits": [
+        "不直接 Verified",
+        "不处理缺少验收标准的任务",
+        "不覆盖用户未授权的本地改动"
+      ]
+    },
+    {
+      "name": "Claude Code Desktop",
+      "role": "长上下文分析与工程协作",
+      "best_for": [
+        "理解大型代码库",
+        "方案比较",
+        "复杂重构前分析",
+        "生成实现建议"
+      ],
+      "handoff": "需要落地验证时转 Codex App 或 Cursor",
+      "limits": [
+        "输出必须包含文件和验证建议",
+        "不把分析结论当作已验证结果"
+      ]
+    },
+    {
+      "name": "Cursor",
+      "role": "交互式编码与快速修改",
+      "best_for": [
+        "局部功能改动",
+        "快速试错",
+        "UI 细节调整",
+        "人工强参与的编辑"
+      ],
+      "handoff": "完成后由 Hermes 汇总回填；必要时由 Codex App 复验",
+      "limits": [
+        "避免承担跨项目批处理",
+        "需要明确当前项目上下文"
+      ]
+    },
+    {
+      "name": "AntiGravity",
+      "role": "探索型 Agent 工作台",
+      "best_for": [
+        "多步骤探索",
+        "原型推演",
+        "跨工具思路验证",
+        "不确定任务拆解"
+      ],
+      "handoff": "将探索结果整理成 Linear Issue 或项目上下文更新",
+      "limits": [
+        "探索输出必须收敛成可执行下一步",
+        "不直接改 Verified 状态"
+      ]
+    }
+  ],
+  "daily_routine": [
+    {
+      "time": "09:00",
+      "title": "Hermes 读取 Linear",
+      "desc": "按项目读取 Ready / Blocked / Review Issue，生成 Telegram 摘要"
+    },
+    {
+      "time": "09:15",
+      "title": "Chris 选择执行任务",
+      "desc": "确认今天要处理的任务和推荐桌面 Agent"
+    },
+    {
+      "time": "执行中",
+      "title": "桌面 Agent 执行",
+      "desc": "使用项目上下文和轻量 Issue 执行任务，输出证据"
+    },
+    {
+      "time": "完成后",
+      "title": "Hermes 回填与追踪",
+      "desc": "更新 Linear 评论和状态，提醒 Review 或进入 Verified"
+    }
+  ],
+  "roadmap": [
+    {
+      "version": "v0.2",
+      "title": "半自动调度",
+      "items": [
+        "Hermes 自动读 Linear",
+        "生成每日任务摘要",
+        "生成可复制执行包"
+      ]
+    },
+    {
+      "version": "v0.3",
+      "title": "本地执行包",
+      "items": [
+        "一键生成 prompt 文件",
+        "打开对应项目目录",
+        "标准化回填模板"
+      ]
+    },
+    {
+      "version": "v0.4",
+      "title": "低风险自动执行",
+      "items": [
+        "对支持 CLI 的工具自动处理低风险任务",
+        "自动跑检查",
+        "统一进入 Review"
+      ]
+    },
+    {
+      "version": "v1.0",
+      "title": "无人值守编排",
+      "items": [
+        "任务自动领取",
+        "执行隔离与权限控制",
+        "审计、重试、转派机制"
+      ]
+    }
+  ]
 }

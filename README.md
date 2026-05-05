@@ -127,10 +127,16 @@ opc-agent-mechanism/
 │   └── config.json    # All data (labels, agents, workflow)
 ├── css/
 │   └── style.css      # Light theme
-└── js/
-    ├── render-labels.js   # Label tree renderer
-    └── render-agents.js  # Agent card renderer
+├── js/
+│   ├── render-labels.js   # Label tree renderer
+│   └── render-agents.js   # Agent card renderer
+└── tools/
+    └── audit-linear-agents.py  # Linear Agent compliance audit tool (MIT License)
 ```
+
+**License Notice**:
+- Project content (visualization, docs): **CC BY-NC 4.0** (non-commercial)
+- `tools/` directory: **MIT License** (commercial-friendly, free to use/modify)
 
 ---
 

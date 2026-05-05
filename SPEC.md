@@ -240,6 +240,41 @@ update_task(
 - 通知 Chris（通过 Telegram）
 - 记录到审计日志
 
+### 使用审计脚本
+
+项目提供了自动化审计工具 `tools/audit-linear-agents.py`：
+
+```bash
+# 设置 Linear API Key
+export LINEAR_API_KEY="your_api_key_here"
+
+# 运行审计
+python tools/audit-linear-agents.py
+```
+
+**输出示例**:
+```
+============================================================
+Linear Agent 合规审计 - 2026-05-04 09:00
+============================================================
+
+🔍 审计评论格式...
+🔍 审计状态流转...
+🔍 审计阻塞任务...
+
+============================================================
+审计结果汇总
+============================================================
+
+✅ 审计通过！未发现违规。
+```
+
+**设置定时任务**（cron）:
+```bash
+# 每天 09:00 运行
+0 9 * * * cd /path/to/opc-agent-mechanism && python tools/audit-linear-agents.py
+```
+
 ---
 
 ## 📂 项目结构
@@ -254,10 +289,16 @@ opc-agent-mechanism/
 │   └── config.json    # 数据驱动核心（标签、Agent、工作流）
 ├── css/
 │   └── style.css      # 浅色主题
-└── js/
-    ├── render-labels.js   # 标签树渲染
-    └── render-agents.js   # Agent 卡片渲染
+├── js/
+│   ├── render-labels.js   # 标签树渲染
+│   └── render-agents.js   # Agent 卡片渲染
+└── tools/
+    └── audit-linear-agents.py  # Linear Agent 合规审计工具 (MIT License)
 ```
+
+**许可证说明**:
+- 项目内容（可视化工具、文档）：**CC BY-NC 4.0**（非商用）
+- `tools/` 目录下的工具：**MIT License**（允许商用和修改）
 
 ---
 

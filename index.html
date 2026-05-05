@@ -3,110 +3,117 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OPC Agent Mechanism v0.1</title>
+  <title>OPC Multi-Agent Workflow v0.2</title>
   <link rel="stylesheet" href="css/style.css">
-  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>🤖 OPC + Agent 协作机制</h1>
-      <p class="subtitle">v0.1 · MVP · 数据驱动可视化</p>
+  <main class="shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">OPC Agent Mechanism v0.2</p>
+        <h1 id="positioning-title">Linear + Hermes + Desktop Agents</h1>
+        <p class="subtitle" id="positioning-subtitle">以任务管理为中心的多 Agent 半自动编排机制</p>
+      </div>
+      <div class="hero-panel">
+        <span class="panel-label">核心原则</span>
+        <ul id="principle-list"></ul>
+      </div>
     </header>
 
-    <!-- 1. 系统架构图 -->
-    <section id="architecture">
-      <h2>🏗️ 系统逻辑架构</h2>
-      <div class="mermaid" id="arch-diagram">
-        graph LR
-          A[Chris OPC] -->|制定战略| B[嘉怡 PM Agent]
-          B -->|分配任务| C[Bob/Alice Dev Agents]
-          C -->|读写 API| D[Linear 中台]
-          D -->|审核结果| A
+    <section class="section" id="architecture">
+      <div class="section-heading">
+        <span>01</span>
+        <div>
+          <h2>协作架构</h2>
+          <p>把 Hermes、Linear、项目上下文和桌面 Agent 的职责拆清楚。</p>
+        </div>
+      </div>
+      <div class="architecture-grid" id="architecture-nodes"></div>
+      <div class="flow-strip" id="architecture-flow"></div>
+    </section>
+
+    <section class="section" id="layers">
+      <div class="section-heading">
+        <span>02</span>
+        <div>
+          <h2>上下文分层</h2>
+          <p>项目层放长期事实，Issue 层写任务差量，评论层留执行证据。</p>
+        </div>
+      </div>
+      <div class="layer-grid" id="context-layers"></div>
+    </section>
+
+    <section class="section split-section" id="workflow">
+      <div>
+        <div class="section-heading compact">
+          <span>03</span>
+          <div>
+            <h2>任务状态流转</h2>
+            <p>Agent 交付进入 Review，Verified 才是闭环。</p>
+          </div>
+        </div>
+        <div class="state-timeline" id="workflow-states"></div>
+        <div class="exception-row" id="workflow-exceptions"></div>
+      </div>
+      <div class="rule-panel">
+        <h3>流转规则</h3>
+        <ul id="workflow-rules"></ul>
       </div>
     </section>
 
-    <!-- 2. 标签层级树 -->
-    <section id="labels">
-      <h2>🏷️ 标签层级体系</h2>
-      <div id="label-tree"></div>
+    <section class="section split-section" id="issue-template">
+      <div>
+        <div class="section-heading compact">
+          <span>04</span>
+          <div>
+            <h2>轻量 Issue 模板</h2>
+            <p>Issue 不重复项目背景，只提供本次执行所需的最小差量。</p>
+          </div>
+        </div>
+        <div class="template-card" id="issue-template-card"></div>
+      </div>
+      <aside class="note-panel">
+        <span>Executor override</span>
+        <p id="executor-override"></p>
+      </aside>
     </section>
 
-    <!-- 3. 任务流转 -->
-    <section id="workflow">
-      <h2>🔄 任务流转规则</h2>
-      <div id="workflow-diagram"></div>
-      <div id="workflow-rules"></div>
+    <section class="section" id="executors">
+      <div class="section-heading">
+        <span>05</span>
+        <div>
+          <h2>桌面 Agent 执行席位</h2>
+          <p>这些不是后台机器人，而是你可以手动启动、由 Hermes 编排的执行工具。</p>
+        </div>
+      </div>
+      <div class="executor-grid" id="executor-grid"></div>
     </section>
 
-    <!-- 4. Agent 卡片 -->
-    <section id="agents">
-      <h2>🤖 Agent 目录</h2>
-      <div id="agent-cards"></div>
+    <section class="section split-section" id="routine">
+      <div>
+        <div class="section-heading compact">
+          <span>06</span>
+          <div>
+            <h2>每日运行节奏</h2>
+            <p>先自动整理任务，再由你选择桌面 Agent 执行。</p>
+          </div>
+        </div>
+        <div class="routine-list" id="daily-routine"></div>
+      </div>
+      <div class="roadmap-panel">
+        <h3>自动化路径</h3>
+        <div id="roadmap"></div>
+      </div>
     </section>
 
-    <footer>
-      <p>OPC Agent Mechanism v0.1 · 数据驱动 · 
-        <a href="data/config.json">查看 config.json</a>
-      </p>
-      <p class="license-info">
-        📃 <strong>License</strong>: <a href="LICENSE">CC BY-NC 4.0</a> (非商用)<br>
-        允许个人学习/使用 · 禁止商用教程/课程 · 
-        <a href="SPEC.md">查看完整方案</a>
-      </p>
+    <footer class="footer">
+      <span>OPC Agent Mechanism v0.2</span>
+      <a href="data/config.json">查看数据配置</a>
+      <a href="AGENTS.md">项目背景</a>
+      <a href="LICENSE">License</a>
     </footer>
-  </div>
+  </main>
 
-  <script src="js/render-labels.js"></script>
-  <script src="js/render-agents.js"></script>
-  <script>
-    // 初始化 Mermaid
-    mermaid.initialize({ 
-      startOnLoad: true,
-      theme: 'default',
-      flowchart: { curve: 'basis' }
-    });
-
-    // 加载数据并渲染
-    fetch('data/config.json')
-      .then(res => res.json())
-      .then(data => {
-        // 渲染标签树
-        renderLabelTree(data.labels);
-        
-        // 渲染 Agent 卡片
-        renderAgentCards(data.agents);
-        
-        // 渲染工作流
-        renderWorkflow(data.workflow);
-      })
-      .catch(err => console.error('加载数据失败:', err));
-    
-    // 工作流渲染
-    function renderWorkflow(workflow) {
-      const diagram = document.getElementById('workflow-diagram');
-      const rules = document.getElementById('workflow-rules');
-      
-      // 状态流转
-      const states = workflow.states;
-      let html = '<div class="workflow-states">';
-      states.forEach((s, i) => {
-        html += `<span class="state ${s.type}">${s.name}</span>`;
-        if (i < states.length - 1) {
-          html += ' <span class="arrow">→</span> ';
-        }
-      });
-      html += '</div>';
-      diagram.innerHTML = html;
-      
-      // 规则列表
-      let rulesHtml = '<ul class="rules-list">';
-      workflow.rules.forEach(rule => {
-        rulesHtml += `<li>${rule}</li>`;
-      });
-      rulesHtml += '</ul>';
-      rules.innerHTML = rulesHtml;
-    }
-  </script>
+  <script src="js/app.js"></script>
 </body>
 </html>
