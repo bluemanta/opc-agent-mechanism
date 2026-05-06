@@ -41,6 +41,16 @@
 - 任务状态流转（待办 → 进行中 → 已完成 → 已验证）
 - 多项目上下文切换
 
+### Linear 标签体系
+
+当前 Infomili Team 的任务路由只保留三类标签：
+
+- **角色标签**：说明任务需要哪类能力处理，例如 `AI-Dev`、`AI-Test`、`AI-Design`、`AI-Review`、`AI-Docs`、`AI-Ops`
+- **员工标签**：说明交给哪个具体 Agent，例如 `Agent-Codex`、`Agent-Cursor`、`Agent-ClaudeCode`、`Agent-AntiGravity`、`Agent-Bob`、`Agent-Oao`
+- **任务类型**：说明任务性质，仅保留 `Feature`、`Bug`、`Improvement`、`Blocked`
+
+每个可执行 Issue 应尽量同时具备 1 个角色标签、1 个员工标签、1 个任务类型标签。所有无法继续推进的任务，包括缺少上下文、权限、决策、依赖或人工 review，都统一使用 `Blocked`；具体阻塞原因写在 Issue 评论中，不再拆分为多个阻塞原因标签。
+
 ### 阶段二：Agent 协作框架
 - Agent 角色定义与注册
 - 任务分配与调度逻辑

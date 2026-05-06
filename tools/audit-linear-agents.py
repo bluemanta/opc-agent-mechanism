@@ -165,7 +165,7 @@ def audit_blocked():
     query($teamId: ID!) {
       issues(filter: {
         team: { id: { eq: $teamId } },
-        labels: { name: { eq: "Agent-Blocked" } }
+        labels: { name: { eq: "Blocked" } }
       }) {
         nodes {
           identifier

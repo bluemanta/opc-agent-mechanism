@@ -1,5 +1,7 @@
-const APP_VERSION = '20260505-7';
+const APP_VERSION = '20260506-1';
 const text = (value) => String(value ?? '');
+let activeCopyBlocks = [];
+let copyButtonsBound = false;
 
 function escapeHtml(value) {
   return text(value)
@@ -24,7 +26,7 @@ function normalizeConfig(data) {
     ],
     links: [
       { from: 'chris', to: 'hermes', label: '目标 / 优先级' },
-      { from: 'linear', to: 'hermes', label: '读取 Ready Issue' },
+      { from: 'linear', to: 'hermes', label: '读取 Todo Issue' },
       { from: 'linear', to: 'agents', label: '直接读取 Issue' }
     ],
     feedback: { from: 'agents', to: 'linear', label: '直接写入 Issue：状态 / 证据 / 风险' },
@@ -34,21 +36,47 @@ function normalizeConfig(data) {
   const defaultWorkflow = {
     states: [
       { name: 'Backlog', desc: '想做但尚未整理成可执行任务', actor: 'Chris / Hermes' },
-      { name: 'Ready', desc: 'Issue 已具备目标、范围和验收标准，桌面 Agent 可直接读取执行', actor: 'Chris / Hermes' },
+      { name: 'Todo', desc: 'Issue 已具备目标、范围和验收标准，桌面 Agent 可直接读取执行', actor: 'Chris / Hermes' },
       { name: 'In Progress', desc: '某个桌面 Agent 正在执行', actor: 'Desktop Agent' },
-      { name: 'Review', desc: 'Agent 已交付证据，等待 Hermes 或 Chris 复核', actor: 'Hermes / Chris' },
-      { name: 'Verified', desc: '结果已确认，可关闭或沉淀', actor: 'Chris / Hermes' }
+      { name: 'In Review', desc: 'Agent 已交付证据，等待 Hermes 或 Chris 复核', actor: 'Hermes / Chris' },
+      { name: 'Done', desc: '结果已确认，可关闭或沉淀', actor: 'Chris / Hermes' }
     ],
     exceptions: [
-      { name: 'Blocked', desc: '缺上下文、权限、决策或外部条件' },
-      { name: 'Cancelled', desc: '任务不再需要执行' }
+      { name: 'Canceled', desc: '任务不再需要执行' },
+      { name: 'Duplicate', desc: '任务与其他 Issue 重复' }
     ],
     rules: [
-      'Agent 完成任务后进入 Review，不直接进入 Verified',
+      'Agent 完成任务后进入 In Review，不直接进入 Done',
       '桌面 Agent 直接读取 Linear Issue，不经过 Hermes 中转',
       'Issue 应写清本次任务目标、范围、验收标准和回填要求',
-      '缺少验收标准的 Issue 不进入 Ready',
+      '缺少验收标准的 Issue 不进入 Todo',
+      '阻塞统一通过评论和 Blocked 标签表达，不新增 Blocked 状态',
       'Hermes 负责 Issue 治理与审核追踪，不生成必经执行包'
+    ]
+  };
+
+  const defaultLabels = {
+    '🎭 角色标签': [
+      { name: 'AI-Design', color: '#9b59b6', desc: '设计、交互、视觉与体验' },
+      { name: 'AI-Dev', color: '#3498db', desc: '开发、工程实现、代码修改' },
+      { name: 'AI-Docs', color: '#1abc9c', desc: '文档、说明、规范、内容沉淀' },
+      { name: 'AI-Ops', color: '#e74c3c', desc: '运维、发布、配置、自动化运行' },
+      { name: 'AI-Review', color: '#e67e22', desc: '审核、复核、验收辅助' },
+      { name: 'AI-Test', color: '#2ecc71', desc: '测试、验证、质量检查' }
+    ],
+    '👤 员工标签': [
+      { name: 'Agent-AntiGravity', color: '#F2994A', desc: 'AntiGravity 桌面 Agent' },
+      { name: 'Agent-Bob', color: '#3498db', desc: 'Bob Agent' },
+      { name: 'Agent-ClaudeCode', color: '#8E6CEF', desc: 'Claude Code Agent' },
+      { name: 'Agent-Codex', color: '#5E6AD2', desc: 'Codex 桌面 Agent' },
+      { name: 'Agent-Cursor', color: '#26B5CE', desc: 'Cursor Agent' },
+      { name: 'Agent-Oao', color: '#2ecc71', desc: 'Oao Agent' }
+    ],
+    '📋 任务类型': [
+      { name: 'Blocked', color: '#95a5a6', desc: '任何无法继续推进的任务；原因写在评论' },
+      { name: 'Bug', color: '#EB5757', desc: '缺陷修复、异常处理、回归问题' },
+      { name: 'Feature', color: '#BB87FC', desc: '新功能、新能力、新页面或新流程' },
+      { name: 'Improvement', color: '#4EA7FC', desc: '优化、调整、重构、质量提升' }
     ]
   };
 
@@ -67,7 +95,7 @@ function normalizeConfig(data) {
     'Hermes 协助把想法整理成清晰的 Linear Issue',
     '桌面 Agent 直接读取 Linear Issue，并结合自身项目 session 上下文执行',
     'Agent 完成后直接回填 Linear Issue 的状态、证据和风险',
-    'Chris 和 Hermes 在 Linear 中审核结果，推动 Review 与 Verified'
+    'Chris 和 Hermes 在 Linear 中审核结果，推动 In Review 与 Done'
   ];
 
   const defaultExecutors = [
@@ -76,7 +104,7 @@ function normalizeConfig(data) {
       role: '本地工程执行与验证',
       best_for: ['跨文件代码修改', '本地测试与构建验证', '结构化重构'],
       handoff: '直接读取 Linear Issue，完成后直接回填 Issue；复杂设计问题可在 Issue 中标记需要澄清。',
-      limits: ['不直接 Verified', '不处理缺少验收标准的任务']
+      limits: ['不直接 Done', '不处理缺少验收标准的任务']
     },
     {
       name: 'Claude Code Desktop',
@@ -97,27 +125,69 @@ function normalizeConfig(data) {
       role: '探索型 Agent 工作台',
       best_for: ['多步骤探索', '原型推演', '不确定任务拆解'],
       handoff: '将探索结果整理成 Linear Issue 或项目上下文更新建议。',
-      limits: ['探索输出必须收敛成可执行下一步', '不直接改 Verified 状态']
+      limits: ['探索输出必须收敛成可执行下一步', '不直接改 Done 状态']
     }
   ];
 
   const defaultRoutine = [
-    { time: '09:00', title: 'Hermes 巡检 Linear', desc: '按项目查看 Ready / Blocked / Review Issue，生成 Telegram 摘要' },
+    { time: '09:00', title: 'Hermes 巡检 Linear', desc: '按项目查看 Todo / Blocked / In Review Issue，生成 Telegram 摘要' },
     { time: '09:15', title: '补齐 Issue', desc: 'Chris 和 Hermes 把目标、范围、验收和回填要求补充清楚' },
     { time: '执行中', title: '桌面 Agent 直读 Issue', desc: 'Agent 在对应项目 session 中读取 Linear Issue，结合已有项目上下文执行' },
-    { time: '完成后', title: 'Linear 中审核', desc: 'Chris 和 Hermes 在 Linear 中审核结果，推动 Review 或 Verified' }
+    { time: '完成后', title: 'Linear 中审核', desc: 'Chris 和 Hermes 在 Linear 中审核结果，推动 In Review 或 Done' }
   ];
 
   const defaultRoadmap = [
     { version: 'v0.2', title: '半自动调度', items: ['Hermes 巡检 Linear', '补齐 Issue 质量', '桌面 Agent 直接读 Issue'] },
     { version: 'v0.3', title: 'Issue 质量治理', items: ['标准 Issue 模板', '验收标准检查', '回填证据检查'] },
-    { version: 'v0.4', title: '低风险自动执行', items: ['对支持 CLI 的工具自动处理低风险任务', '自动跑检查', '统一进入 Review'] },
+    { version: 'v0.4', title: '低风险自动执行', items: ['对支持 CLI 的工具自动处理低风险任务', '自动跑检查', '统一进入 In Review'] },
     { version: 'v1.0', title: '无人值守编排', items: ['任务自动领取', '执行隔离与权限控制', '审计、重试、转派机制'] }
   ];
+
+  const defaultWorkflowImplementation = {
+    setup_sequence: [
+      { phase: 'Step 1', title: '配置 Linear 工作区', desc: '确认沿用 Linear 现有状态流转，再补齐权限边界和标签体系。' },
+      { phase: 'Step 2', title: '建立项目档案', desc: '记录本地 repo/session、默认桌面 Agent、验证方式和当前阶段。' },
+      { phase: 'Step 3', title: '创建 5-10 个试点 Issue', desc: '按标准模板补齐 Task、Scope、Acceptance、Return Evidence，并选择角色、员工和任务类型标签。' },
+      { phase: 'Step 4', title: '桌面 Agent 直读 Issue', desc: '在对应项目 session 中读取 Issue，并推进到 In Progress。' },
+      { phase: 'Step 5', title: '执行结果回写 Linear', desc: '在 Issue 评论中写 Result、Changed、Verification、Risks、Next，并进入 In Review。' },
+      { phase: 'Step 6', title: 'Chris / Hermes 审核', desc: '通过则 Done；不通过则说明原因并退回。' },
+      { phase: 'Step 7', title: '一周复盘并固化规则', desc: '复盘 Issue 质量、证据格式、状态流转和三类标签分流。' }
+    ],
+    copy_blocks: [
+      {
+        title: 'Linear Issue 标准模板',
+        desc: '创建或补齐 Todo Issue 时直接复制。',
+        content: '## Labels\n- Role: AI-Dev / AI-Test / AI-Design / AI-Review / AI-Docs / AI-Ops\n- Agent: Agent-Codex / Agent-Cursor / Agent-ClaudeCode / Agent-AntiGravity / Agent-Bob / Agent-Oao\n- Type: Feature / Bug / Improvement / Blocked\n\n## Task\n要完成什么。\n\n## Background\n本任务必要背景。项目通用背景不用重复，除非本任务特别相关。\n\n## Scope\n本次要做什么 / 不做什么。\n\n## Acceptance\n什么算完成。\n\n## Return Evidence\n完成后直接回填：变更摘要、文件/链接、验证结果、风险。'
+      },
+      {
+        title: 'Agent 回填评论模板',
+        desc: '桌面 Agent 完成任务后直接贴到 Linear Issue 评论。',
+        content: '## Result\n完成了什么。\n\n## Changed\n涉及的文件、PR、链接或产物。\n\n## Verification\n运行了什么检查，结果如何。\n\n## Risks\n剩余风险、未覆盖部分、需要人工判断的点。\n\n## Next\n建议下一步；没有则写“无”。'
+      },
+      {
+        title: 'Linear Project 档案模板',
+        desc: '放在 Linear Project 描述或项目 Wiki，用于承载长期项目背景。',
+        content: '## Project Session\n- 本地 repo / workspace:\n- 默认桌面 Agent:\n- 常用验证方式:\n- 当前阶段:\n- 重要限制:\n\n## Agent Session Notes\n- 该项目通常在哪个桌面 Agent 中处理:\n- Agent session 需要提前打开的目录或工具:\n- 常见上下文来源:\n\n## Label Rules\n- 角色标签: AI-Dev / AI-Test / AI-Design / AI-Review / AI-Docs / AI-Ops\n- 员工标签: Agent-Codex / Agent-Cursor / Agent-ClaudeCode / Agent-AntiGravity / Agent-Bob / Agent-Oao\n- 任务类型: Feature / Bug / Improvement / Blocked\n- 每个可执行 Issue 应尽量同时具备 1 个角色标签、1 个员工标签、1 个任务类型标签\n- 所有阻塞、待澄清、待权限、待决策、待人工 review 的任务统一使用 Blocked；具体原因写在 Issue 评论中\n\n## Review Rules\n- 谁可以 Done:\n- 哪些任务必须 Chris 审核:\n- 哪些任务可以 Hermes 初审:'
+      },
+      {
+        title: 'Hermes 每日巡检模板',
+        desc: '每日早间巡检 Linear 时，用于给 Chris 汇总建议。',
+        content: '## Todo\n- Issue:\n- 标签完整性（角色 / 员工 / 任务类型）:\n- 推荐动作:\n\n## Blocked\n- Issue:\n- 阻塞原因:\n- 需要 Chris 决策:\n\n## In Review\n- Issue:\n- 初审意见:\n- 建议通过 / 退回:\n\n## Stale\n- Issue:\n- 最后更新时间:\n- 建议动作:\n\n## Today\n1.\n2.\n3.'
+      }
+    ],
+    pilot_checklist: [
+      '只选择 1 个真实项目试跑，不要一次铺开所有项目',
+      '先准备 5-10 个真实 Issue，并为每个 Issue 选择角色、员工和任务类型标签',
+      '每个桌面 Agent 至少执行 1 个 Issue，观察是否能只靠项目 session + Issue 完成任务',
+      '所有完成结果都必须进入 In Review，并附带证据',
+      '试跑 1 周后复盘 Issue 质量、状态流转、证据格式和 Agent 分工'
+    ]
+  };
 
   if (data.positioning) {
     return {
       ...data,
+      labels: data.labels || defaultLabels,
       architecture: {
         ...data.architecture,
         diagram: data.architecture?.diagram || defaultDiagram,
@@ -130,6 +200,13 @@ function normalizeConfig(data) {
         states: data.workflow?.states || defaultWorkflow.states,
         exceptions: data.workflow?.exceptions || defaultWorkflow.exceptions,
         rules: data.workflow?.rules || defaultWorkflow.rules
+      },
+      workflow_implementation: {
+        ...defaultWorkflowImplementation,
+        ...data.workflow_implementation,
+        setup_sequence: data.workflow_implementation?.setup_sequence || defaultWorkflowImplementation.setup_sequence,
+        copy_blocks: data.workflow_implementation?.copy_blocks || defaultWorkflowImplementation.copy_blocks,
+        pilot_checklist: data.workflow_implementation?.pilot_checklist || defaultWorkflowImplementation.pilot_checklist
       }
     };
   }
@@ -145,7 +222,7 @@ function normalizeConfig(data) {
         '桌面 Agent 直接读取 Linear Issue，并结合自身项目 session 上下文执行',
         '桌面 Agent 的执行结果直接回填到 Linear Issue',
         '如果任务不够清楚，优先把 Linear Issue 写得更完整',
-        'Agent 完成不等于闭环，Verified 才代表任务真正结束'
+        'Agent 完成不等于闭环，Done 才代表任务真正结束'
       ]
     },
     architecture: {
@@ -170,19 +247,21 @@ function normalizeConfig(data) {
       {
         name: '执行回填层',
         owner: 'Desktop Agent',
-        purpose: '执行结果直接写入 Linear Issue，支撑 Review 和 Verified',
+        purpose: '执行结果直接写入 Linear Issue，支撑 In Review 和 Done',
         contents: ['变更摘要、文件或产物链接', '验证命令与结果', '风险、阻塞点、下一步建议']
       }
     ],
+    labels: data.labels || defaultLabels,
     issue_template: data.issue_template || {
       sections: [
+        { title: 'Labels', body: 'Role: AI-Dev / AI-Test / AI-Design / AI-Review / AI-Docs / AI-Ops\nAgent: Agent-Codex / Agent-Cursor / Agent-ClaudeCode / Agent-AntiGravity / Agent-Bob / Agent-Oao\nType: Feature / Bug / Improvement / Blocked' },
         { title: 'Task', body: '本次要完成什么。' },
         { title: 'Background', body: '本任务必要背景。项目通用背景不用重复，除非本任务特别相关。' },
         { title: 'Scope', body: '本次要做什么 / 不做什么。' },
         { title: 'Acceptance', body: '什么算完成。' },
         { title: 'Return Evidence', body: '完成后直接在 Linear Issue 回填：变更摘要、文件/链接、验证结果、风险、下一步建议。' }
       ],
-      executor_override: '仅当不使用项目默认 Agent 时填写：Executor override + 原因'
+      executor_override: '通常用员工标签指定具体 Agent；仅当标签不足以表达时填写补充原因'
     },
     workflow: {
       ...defaultWorkflow,
@@ -191,12 +270,19 @@ function normalizeConfig(data) {
       exceptions: data.workflow?.exceptions || defaultWorkflow.exceptions,
       rules: data.workflow?.rules || defaultWorkflow.rules
     },
+    workflow_implementation: {
+      ...defaultWorkflowImplementation,
+      ...(data.workflow_implementation || {}),
+      setup_sequence: data.workflow_implementation?.setup_sequence || defaultWorkflowImplementation.setup_sequence,
+      copy_blocks: data.workflow_implementation?.copy_blocks || defaultWorkflowImplementation.copy_blocks,
+      pilot_checklist: data.workflow_implementation?.pilot_checklist || defaultWorkflowImplementation.pilot_checklist
+    },
     executors: data.executors || ((data.agents || []).length ? data.agents.map((agent) => ({
       name: agent.name,
       role: agent.role,
       best_for: agent.duties || [],
       handoff: '执行结果直接回填 Linear Issue。',
-      limits: ['不直接 Verified', '需要明确项目上下文']
+      limits: ['不直接 Done', '需要明确项目上下文']
     })) : defaultExecutors),
     daily_routine: data.daily_routine || defaultRoutine,
     roadmap: data.roadmap || defaultRoadmap
@@ -339,7 +425,7 @@ function renderLogicDiagram(diagram) {
         <div>
           <span>03</span>
           <strong>Linear 是中心账本</strong>
-          <p>Chris 与 Hermes 都在 Linear 里完成 Review 与 Verified。</p>
+          <p>Chris 与 Hermes 都在 Linear 里完成 In Review 与 Done。</p>
         </div>
       </div>
     </div>
@@ -410,6 +496,30 @@ function renderWorkflow(workflow) {
     .join('');
 }
 
+function renderLabels(labels) {
+  const container = document.getElementById('label-taxonomy');
+  if (!container) return;
+
+  container.innerHTML = Object.entries(labels || {})
+    .map(([groupName, items]) => `
+      <article class="label-card">
+        <h3>${escapeHtml(groupName)}</h3>
+        <div class="label-list">
+          ${items.map((label) => `
+            <div class="label-row">
+              <span class="label-dot" style="background: ${escapeHtml(label.color)}"></span>
+              <div>
+                <strong>${escapeHtml(label.name)}</strong>
+                <p>${escapeHtml(label.desc || '')}</p>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </article>
+    `)
+    .join('');
+}
+
 function renderIssueTemplate(template) {
   document.getElementById('issue-template-card').innerHTML = template.sections
     .map((section) => `
@@ -421,6 +531,53 @@ function renderIssueTemplate(template) {
     .join('');
 
   document.getElementById('executor-override').textContent = template.executor_override;
+}
+
+function renderSetupSequence(sequence) {
+  const container = document.getElementById('setup-sequence-list');
+  if (!container) return;
+
+  container.innerHTML = sequence
+    .map((item, index) => `
+      <article class="setup-step">
+        <div class="setup-marker">${String(index + 1).padStart(2, '0')}</div>
+        <div>
+          <span>${escapeHtml(item.phase)}</span>
+          <h3>${escapeHtml(item.title)}</h3>
+          <p>${escapeHtml(item.desc)}</p>
+        </div>
+      </article>
+    `)
+    .join('');
+}
+
+function renderCopyBlocks(blocks) {
+  const container = document.getElementById('copy-blocks');
+  if (!container) return;
+
+  container.innerHTML = blocks
+    .map((block, index) => `
+      <article class="copy-card">
+        <div class="copy-card-header">
+          <div>
+            <h3>${escapeHtml(block.title)}</h3>
+            <p>${escapeHtml(block.desc)}</p>
+          </div>
+          <button class="copy-button" type="button" data-copy-index="${index}" aria-label="复制 ${escapeHtml(block.title)}">复制</button>
+        </div>
+        <pre><code>${escapeHtml(block.content)}</code></pre>
+      </article>
+    `)
+    .join('');
+}
+
+function renderPilotChecklist(items) {
+  const container = document.getElementById('pilot-checklist');
+  if (!container) return;
+
+  container.innerHTML = items
+    .map((item) => `<li>${escapeHtml(item)}</li>`)
+    .join('');
 }
 
 function renderExecutors(executors) {
@@ -468,6 +625,53 @@ function renderRoadmap(roadmap) {
     .join('');
 }
 
+async function copyText(value) {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(value);
+    return;
+  }
+
+  const textarea = document.createElement('textarea');
+  textarea.value = value;
+  textarea.setAttribute('readonly', '');
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand('copy');
+  textarea.remove();
+}
+
+function bindCopyButtons(config) {
+  activeCopyBlocks = config.workflow_implementation.copy_blocks || [];
+  if (copyButtonsBound) return;
+  copyButtonsBound = true;
+
+  document.addEventListener('click', async (event) => {
+    const button = event.target.closest('[data-copy-index]');
+    if (!button) return;
+
+    const index = Number(button.dataset.copyIndex);
+    const content = activeCopyBlocks[index]?.content;
+    if (!content) return;
+
+    const original = button.textContent;
+    try {
+      await copyText(content);
+      button.textContent = '已复制';
+      button.classList.add('is-copied');
+    } catch (error) {
+      console.warn('复制失败', error);
+      button.textContent = '复制失败';
+    }
+
+    window.setTimeout(() => {
+      button.textContent = original;
+      button.classList.remove('is-copied');
+    }, 1600);
+  });
+}
+
 function render(data) {
   const config = normalizeConfig(data);
 
@@ -475,10 +679,15 @@ function render(data) {
   renderArchitecture(config.architecture);
   renderContextLayers(config.context_layers);
   renderWorkflow(config.workflow);
+  renderLabels(config.labels);
   renderIssueTemplate(config.issue_template);
+  renderSetupSequence(config.workflow_implementation.setup_sequence);
+  renderCopyBlocks(config.workflow_implementation.copy_blocks);
+  renderPilotChecklist(config.workflow_implementation.pilot_checklist);
   renderExecutors(config.executors);
   renderRoutine(config.daily_routine);
   renderRoadmap(config.roadmap);
+  bindCopyButtons(config);
 }
 
 fetch(`data/config.json?v=${APP_VERSION}`, { cache: 'no-store' })

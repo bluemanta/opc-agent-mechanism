@@ -50,7 +50,7 @@
           <span>03</span>
           <div>
             <h2>任务状态流转</h2>
-            <p>Agent 交付进入 Review，Verified 才是闭环。</p>
+            <p>Agent 交付进入 In Review，Done 才是闭环。</p>
           </div>
         </div>
         <div class="state-timeline" id="workflow-states"></div>
@@ -62,10 +62,21 @@
       </div>
     </section>
 
+    <section class="section" id="labels">
+      <div class="section-heading">
+        <span>04</span>
+        <div>
+          <h2>Linear 标签体系</h2>
+          <p>每个 Issue 用角色、员工和任务类型三类标签完成路由；阻塞统一使用 Blocked。</p>
+        </div>
+      </div>
+      <div class="label-grid" id="label-taxonomy"></div>
+    </section>
+
     <section class="section split-section" id="issue-template">
       <div>
         <div class="section-heading compact">
-          <span>04</span>
+          <span>05</span>
           <div>
             <h2>Linear Issue 模板</h2>
             <p>Issue 是任务本体，需要写清目标、范围、验收和回填要求。</p>
@@ -79,9 +90,37 @@
       </aside>
     </section>
 
+    <section class="section split-section" id="setup">
+      <div>
+        <div class="section-heading compact">
+          <span>06</span>
+          <div>
+            <h2>搭建执行顺序</h2>
+            <p>先搭账本，再放项目背景，然后用真实 Issue 跑一周试点。</p>
+          </div>
+        </div>
+        <div class="setup-sequence" id="setup-sequence-list"></div>
+      </div>
+      <aside class="check-panel">
+        <h3>试点检查清单</h3>
+        <ul id="pilot-checklist"></ul>
+      </aside>
+    </section>
+
+    <section class="section" id="copy-templates">
+      <div class="section-heading">
+        <span>07</span>
+        <div>
+          <h2>可复制工作模板</h2>
+          <p>把这些 Markdown 直接复制到 Linear Project、Linear Issue 或 Issue 评论里使用。</p>
+        </div>
+      </div>
+      <div class="copy-grid" id="copy-blocks"></div>
+    </section>
+
     <section class="section" id="executors">
       <div class="section-heading">
-        <span>05</span>
+        <span>08</span>
         <div>
           <h2>桌面 Agent</h2>
           <p>这些不是后台机器人，而是已经绑定项目上下文、可直接读取 Linear Issue 的桌面执行工具。</p>
@@ -93,7 +132,7 @@
     <section class="section split-section" id="routine">
       <div>
         <div class="section-heading compact">
-          <span>06</span>
+          <span>09</span>
           <div>
             <h2>每日运行节奏</h2>
             <p>先自动整理任务，再由你选择桌面 Agent 执行。</p>
@@ -115,6 +154,6 @@
     </footer>
   </main>
 
-  <script src="js/app.js?v=20260505-7"></script>
+  <script src="js/app.js?v=20260506-1"></script>
 </body>
 </html>

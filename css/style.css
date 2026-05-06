@@ -91,7 +91,8 @@ a:hover {
 .section,
 .note-panel,
 .roadmap-panel,
-.rule-panel {
+.rule-panel,
+.check-panel {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--panel);
@@ -159,7 +160,9 @@ a:hover {
 
 .architecture-grid,
 .layer-grid,
-.executor-grid {
+.executor-grid,
+.label-grid,
+.copy-grid {
   display: grid;
   gap: 14px;
 }
@@ -366,6 +369,10 @@ a:hover {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.label-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .executor-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
@@ -373,8 +380,11 @@ a:hover {
 .architecture-card,
 .layer-card,
 .executor-card,
+.label-card,
 .state-card,
 .template-card,
+.setup-step,
+.copy-card,
 .routine-item,
 .roadmap-item {
   border: 1px solid var(--line);
@@ -385,6 +395,47 @@ a:hover {
 .architecture-card {
   min-height: 164px;
   padding: 18px;
+}
+
+.label-card {
+  padding: 18px;
+}
+
+.label-card h3 {
+  margin: 0 0 16px;
+  font-size: 18px;
+  letter-spacing: 0;
+}
+
+.label-list {
+  display: grid;
+  gap: 12px;
+}
+
+.label-row {
+  display: grid;
+  grid-template-columns: 14px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+
+.label-dot {
+  width: 10px;
+  height: 10px;
+  margin-top: 5px;
+  border-radius: 50%;
+}
+
+.label-row strong {
+  display: block;
+  font-size: 15px;
+}
+
+.label-row p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .architecture-card span {
@@ -399,6 +450,8 @@ a:hover {
 .executor-card h3,
 .state-card h3,
 .template-section h3,
+.setup-step h3,
+.copy-card h3,
 .routine-item h3 {
   margin: 10px 0 8px;
   font-size: 18px;
@@ -410,6 +463,8 @@ a:hover {
 .executor-card p,
 .state-card p,
 .template-section p,
+.setup-step p,
+.copy-card p,
 .routine-item p,
 .note-panel p,
 .roadmap-item li {
@@ -544,12 +599,14 @@ a:hover {
 
 .rule-panel,
 .roadmap-panel,
-.note-panel {
+.note-panel,
+.check-panel {
   padding: 20px;
 }
 
 .rule-panel h3,
-.roadmap-panel h3 {
+.roadmap-panel h3,
+.check-panel h3 {
   margin: 0 0 12px;
   font-size: 20px;
 }
@@ -577,6 +634,135 @@ a:hover {
 
 .note-panel {
   background: #eff4f7;
+}
+
+.setup-sequence {
+  display: grid;
+  gap: 10px;
+}
+
+.setup-step {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  gap: 14px;
+  padding: 16px;
+  background: #fbfcfa;
+}
+
+.setup-marker {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background: #eff4f7;
+  color: var(--blue);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.setup-step span {
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.setup-step h3 {
+  margin: 4px 0 6px;
+}
+
+.check-panel {
+  background: #f7f8f4;
+}
+
+.check-panel ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.check-panel li {
+  position: relative;
+  padding: 12px 0 12px 22px;
+  border-top: 1px solid var(--line);
+  color: #394039;
+  font-size: 14px;
+}
+
+.check-panel li:first-child {
+  border-top: 0;
+}
+
+.check-panel li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 19px;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--amber);
+}
+
+.copy-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.copy-card {
+  display: flex;
+  min-height: 360px;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fbfcfa;
+}
+
+.copy-card-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: start;
+  padding: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.copy-card h3 {
+  margin: 0 0 6px;
+}
+
+.copy-button {
+  min-width: 72px;
+  height: 36px;
+  border: 1px solid rgba(53, 111, 159, 0.28);
+  border-radius: 8px;
+  background: #eef4f7;
+  color: var(--blue);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.copy-button:hover,
+.copy-button.is-copied {
+  background: var(--blue);
+  color: #fff;
+}
+
+.copy-card pre {
+  flex: 1;
+  margin: 0;
+  padding: 18px;
+  overflow: auto;
+  background: #20231f;
+  color: #f4f7ef;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.copy-card code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  white-space: pre;
 }
 
 .executor-card h4 {
@@ -645,7 +831,9 @@ a:hover {
   .architecture-grid,
   .flow-strip,
   .state-timeline,
-  .executor-grid {
+  .executor-grid,
+  .label-grid,
+  .copy-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -694,11 +882,15 @@ a:hover {
   .flow-strip,
   .state-timeline,
   .exception-row,
-  .executor-grid {
+  .executor-grid,
+  .label-grid,
+  .copy-grid {
     grid-template-columns: 1fr;
   }
 
   .template-section,
+  .setup-step,
+  .copy-card-header,
   .routine-item {
     grid-template-columns: 1fr;
   }
