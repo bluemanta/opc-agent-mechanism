@@ -110,6 +110,33 @@ opc-agent-mechanism/
 
 ---
 
+## Cursor Cloud specific instructions
+
+### 运行静态站点
+
+```bash
+python3 -m http.server 8000 --directory /workspace
+```
+
+站点使用 `fetch()` 加载 `data/config.json`，因此不能用 `file://` 协议打开，必须通过 HTTP 服务。
+
+### 验证工具
+
+```bash
+python3 tools/validate-linear-mvp.py issue <file.md>
+python3 tools/validate-linear-mvp.py result <file.md>
+```
+
+模板文件本身包含占位符，验证会报 placeholder 错误——这是预期行为。仅在填入真实任务内容后验证才会通过。
+
+### 注意事项
+
+- 无 `package.json`、无 `requirements.txt`、无构建步骤。项目是纯静态 HTML/CSS/JS + 标准库 Python 脚本。
+- `tools/audit-linear-agents.py` 需要 `pip install requests` 和 `LINEAR_API_KEY` 环境变量，属于可选审计工具，不影响主站点运行。
+- 数据层只有 `data/config.json`；修改后刷新浏览器即可看到效果（JS 端有 `cache: 'no-store'`）。
+
+---
+
 **最后更新**：2026-05-05  
 **维护者**：Chris Wang (wccshow@gmail.com)  
 **协作助手**：嘉怡 (Hermes Agent)
