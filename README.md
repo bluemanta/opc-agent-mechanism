@@ -1,4 +1,4 @@
-# OPC Agent Mechanism
+# bluemanta-opc
 
 > Linear Issue 直读式多桌面 Agent 工作流 MVP。
 
@@ -13,6 +13,8 @@ This repository contains two things:
 
 1. A static visualizer for explaining the workflow.
 2. A practical workflow kit for running the MVP with Linear, Hermes, and desktop Agent tools.
+
+`bluemanta-opc` was formerly named OPC Agent Mechanism. The new name keeps the OPC concept while making the project identity explicitly tied to Bluemanta.
 
 The MVP does not build a new task platform. Linear is the single source of truth, and each Linear Issue is the task body. Desktop Agents such as Codex App, Cursor, Claude Code Desktop, and AntiGravity read the Issue directly in their project session, execute the task, and write status/evidence back to the same Issue.
 
@@ -89,7 +91,7 @@ http://127.0.0.1:8000
 GitHub Pages:
 
 ```text
-https://bluemanta.github.io/opc-agent-mechanism/
+https://bluemanta.github.io/bluemanta-opc/
 ```
 
 ---
@@ -97,7 +99,7 @@ https://bluemanta.github.io/opc-agent-mechanism/
 ## Project Structure
 
 ```text
-opc-agent-mechanism/
+bluemanta-opc/
 ├── index.html
 ├── data/config.json
 ├── css/style.css

@@ -1,9 +1,9 @@
 {
   "version": "0.2",
-  "last_updated": "2026-05-06",
+  "last_updated": "2026-05-29",
   "positioning": {
-    "title": "Linear + Hermes + Desktop Agents",
-    "subtitle": "以 Linear Issue 为任务本体，桌面 Agent 直接读取并执行的半自动 OPC 工作流",
+    "title": "Bluemanta OPC",
+    "subtitle": "Linear Issue 直读式多桌面 Agent 工作流 MVP",
     "principles": [
       "Linear Issue 是任务本体，也是唯一任务账本",
       "Hermes 负责协助创建、梳理、优先级排序、审核和追踪 Issue",

@@ -1,8 +1,8 @@
-# AGENTS.md — 项目背景与定位
+# AGENTS.md — bluemanta-opc 项目背景与定位
 
 ## 项目概述
 
-本项目原名 **OPC Agent Mechanism**（One Person Company + AI Agent 协作机制），现正在进行品牌重塑与定位升级。
+本项目现名 **bluemanta-opc**，原名 **OPC Agent Mechanism**（One Person Company + AI Agent 协作机制）。新名称保留 OPC 方向，同时加入 Bluemanta 个人/组织标识。
 
 ### 新定位
 
@@ -100,9 +100,9 @@
 ## 项目结构（当前）
 
 ```
-opc-agent-mechanism/
+bluemanta-opc/
 ├── index.html          # 主展示页面
-├── config.json         # 数据配置文件
+├── data/config.json    # 数据配置文件
 ├── css/                # 样式文件
 ├── js/                 # 交互逻辑
 └── AGENTS.md           # 本文件（项目背景与协作指南）
@@ -110,6 +110,6 @@ opc-agent-mechanism/
 
 ---
 
-**最后更新**：2026-05-05  
-**维护者**：Chris Wang (wccshow@gmail.com)  
+**最后更新**：2026-05-29
+**维护者**：Chris Wang (wccshow@gmail.com)
 **协作助手**：嘉怡 (Hermes Agent)

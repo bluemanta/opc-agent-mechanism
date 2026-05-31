@@ -1,8 +1,8 @@
-# OPC Agent Mechanism v0.2 - Linear Issue Direct-Read MVP
+# bluemanta-opc v0.2 - Linear Issue Direct-Read MVP
 
 ## Positioning
 
-This MVP is a local operating workflow for an OPC user coordinating multiple desktop Agent tools through Linear.
+`bluemanta-opc`, formerly OPC Agent Mechanism, is a local operating workflow for an OPC user coordinating multiple desktop Agent tools through Linear.
 
 The system is intentionally lightweight:
 
